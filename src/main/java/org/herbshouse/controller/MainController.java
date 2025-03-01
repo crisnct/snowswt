@@ -21,6 +21,8 @@ public interface MainController {
 
   void registerSoundController(SoundsController soundController);
 
+  void registerViewController(ViewController viewController);
+
   List<Generator<? extends AbstractMovableObject>> getGenerators();
 
   int getDesiredFps();

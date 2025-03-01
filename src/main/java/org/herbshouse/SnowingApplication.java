@@ -45,19 +45,21 @@ public class SnowingApplication {
       transform.translate(0, -GuiUtils.SCREEN_BOUNDS.height);
 
       SnowShell shell = new SnowShell(transform);
-      enemyGenerator.setViewController(shell);
 
       DefaultControllerImpl controller = new DefaultControllerImpl();
+      controller.registerSoundController(shell);
+      controller.registerViewController(shell);
+
       controller.setDesiredFPS(120);
       controller.setUserInfo(new UserInfo());
       controller.setTransform(transform);
       controller.setAudio(audioPlayer);
+
       controller.registerGenerator(fractalsGenerator);
       controller.registerGenerator(snowGenerator);
       controller.registerGenerator(enemyGenerator);
       controller.registerGenerator(graphicalSoundsGenerator);
       controller.registerGenerator(blackholeGenerator);
-      controller.registerSoundController(shell);
 
       shell.setController(controller);
       shell.open();

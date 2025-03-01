@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.herbshouse.audio.AudioPlayOrder;
 import org.herbshouse.controller.FlagsConfiguration;
+import org.herbshouse.controller.ViewController;
 import org.herbshouse.gui.GuiUtils;
 import org.herbshouse.logic.AbstractGenerator;
 import org.herbshouse.logic.AbstractMovableObject;
@@ -105,7 +106,12 @@ public class EnemyGenerator extends AbstractGenerator<AbstractMovableObject> {
         double[] circlePoints
             = Utils.generateCircle(redFace.getLocation(), redFace.getSize() / 2.0d,
             redFace.getSize(), 0);
-        this.substractAreaFromShell(GuiUtils.toScreenCoord(circlePoints));
+        if (getLogicController() instanceof ViewController viewController) {
+          viewController.substractAreaFromShell(GuiUtils.toScreenCoord(circlePoints));
+          AudioPlayOrder order = new AudioPlayOrder("sounds/hole-in-the-shell.wav", 1500);
+          order.setVolume(0.9f);
+          getLogicController().getAudioPlayer().play(order);
+        }
         this.removeRedFace(redFace);
         continue;
       }
@@ -182,7 +188,7 @@ public class EnemyGenerator extends AbstractGenerator<AbstractMovableObject> {
   public void reset() {
     cleanup();
     this.generateRedFace();
-    resetScreenSurface();
+    getLogicController().resetScreenSurface();
   }
 
   private void cleanup() {

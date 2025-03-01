@@ -26,11 +26,13 @@ public class DefaultControllerImpl
     SoundsController,
     RedfacesController,
     BlackholeController,
+    ViewController,
     SelfController {
 
   private final FlagsConfiguration flagsConfiguration = new FlagsConfiguration();
   private final List<Generator<? extends AbstractMovableObject>> generators = new ArrayList<>();
   private final List<SoundsController> soundControllers = new ArrayList<>();
+  private final List<ViewController> viewControllers = new ArrayList<>();
 
   private int desiredFPS;
   private UserInfo userInfo;
@@ -48,15 +50,19 @@ public class DefaultControllerImpl
     listener.setLogicController(this);
     listener.init(flagsConfiguration, GuiUtils.SCREEN_BOUNDS);
     generators.add(listener);
-    if (listener instanceof SoundsController soundController) {
-      registerSoundController(soundController);
-    }
   }
 
   @Override
   public void registerSoundController(SoundsController soundController) {
     if (!soundControllers.contains(soundController)) {
       soundControllers.add(soundController);
+    }
+  }
+
+  @Override
+  public void registerViewController(ViewController viewController) {
+    if (!viewControllers.contains(viewController)) {
+      viewControllers.add(viewController);
     }
   }
 
@@ -378,6 +384,20 @@ public class DefaultControllerImpl
         task.run();
       }
     }, delaySeconds * 1000);
+  }
+
+  @Override
+  public void substractAreaFromShell(int[] polygon) {
+    Display.getDefault().asyncExec(() -> {
+      viewControllers.forEach(view -> view.substractAreaFromShell(polygon));
+    });
+  }
+
+  @Override
+  public void resetScreenSurface() {
+    Display.getDefault().asyncExec(() -> {
+      viewControllers.forEach(ViewController::resetScreenSurface);
+    });
   }
 
 }
