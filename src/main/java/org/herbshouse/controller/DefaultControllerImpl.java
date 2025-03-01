@@ -327,36 +327,42 @@ public class DefaultControllerImpl
 
   @Override
   public void startSelfControlling(boolean skipAnimation) {
-    long start = 1;
-    long durationLetItSnow = 112;
+    long durationLetItSnow = 60 + 52;
     long durationFractalsDraw = 37;
-    long timeOffset = skipAnimation ? start : 30;
-    timeOffset += durationLetItSnow;
     long durationFrozenMusic = 3 * 60 + 41;
+    long time = skipAnimation ? 1 : 40;
 
-    this.scheduleTask(start, this::switchFractals);
-    this.scheduleTask(start, this::switchYoutube);
+    this.scheduleTask(time, this::switchFractals);
 
-    start += durationFractalsDraw;
-    this.scheduleTask(start, () -> setFractalsType(TreeType.RANDOM_DEFAULT));
-    start += durationFractalsDraw;
-    this.scheduleTask(start, () -> setFractalsType(TreeType.PERFECT_FIR));
-    start += durationFractalsDraw;
-    this.scheduleTask(start, () -> setFractalsType(TreeType.RANDOM_FIR));
-    //Turn off music let it snow
-    this.scheduleTask(timeOffset, this::switchYoutube);
-
-    //Starts attack
-    this.scheduleTask(timeOffset + 3, () -> {
-      setAttackType(3);
+    //Play Let it snow
+    this.scheduleTask(time, this::switchYoutube);
+    this.scheduleTask(time + 30, () -> {
       if (!flagsConfiguration.isAttack()) {
         switchAttack();
       }
     });
+    this.scheduleTask(time + 60, () -> {
+      setAttackType(2);
+    });
+    this.scheduleTask(time + 90, () -> {
+      setAttackType(3);
+    });
+    this.scheduleTask(time + 120, () -> {
+      setAttackType(4);
+    });
+    this.scheduleTask(time + durationLetItSnow, this::switchYoutube);
 
-    start += durationFractalsDraw;
-    // Start frozen music
-    this.scheduleTask(start, () -> {
+    //Fractals
+    time += durationFractalsDraw;
+    this.scheduleTask(time, () -> setFractalsType(TreeType.RANDOM_DEFAULT));
+    time += durationFractalsDraw;
+    this.scheduleTask(time, () -> setFractalsType(TreeType.PERFECT_FIR));
+    time += durationFractalsDraw;
+    this.scheduleTask(time, () -> setFractalsType(TreeType.RANDOM_FIR));
+    time += durationFractalsDraw;
+
+    // Start play Frozen
+    this.scheduleTask(time, () -> {
       switchYoutube();
       if (flagsConfiguration.isAttack()) {
         switchAttack();
@@ -367,13 +373,13 @@ public class DefaultControllerImpl
     });
 
     //Stop frozen music and wind
-    this.scheduleTask(start + durationFrozenMusic, () -> {
+    this.scheduleTask(time + durationFrozenMusic, () -> {
       switchYoutube();
       switchNormalWind();
     });
-    start += 35;
+    time += 35;
     //Start wind
-    this.scheduleTask(start, this::switchNormalWind);
+    this.scheduleTask(time, this::switchNormalWind);
 
   }
 
