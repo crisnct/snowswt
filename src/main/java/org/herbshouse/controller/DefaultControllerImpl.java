@@ -376,6 +376,7 @@ public class DefaultControllerImpl
     this.scheduleTask(time + durationFrozenMusic, () -> {
       switchYoutube();
       switchNormalWind();
+      reset();
     });
     time += 35;
     //Start wind
