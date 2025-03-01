@@ -2,6 +2,9 @@ package org.herbshouse.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Transform;
 import org.herbshouse.audio.AudioPlayOrder;
@@ -22,7 +25,8 @@ public class DefaultControllerImpl
     FractalsController,
     SoundsController,
     RedfacesController,
-    BlackholeController {
+    BlackholeController,
+    SelfController {
 
   private final FlagsConfiguration flagsConfiguration = new FlagsConfiguration();
   private final List<GeneratorListener<? extends AbstractMovableObject>> listeners = new ArrayList<>();
@@ -31,6 +35,11 @@ public class DefaultControllerImpl
   private Transform transform;
   private int currentAttackPhase;
   private AudioPlayer audioPlayer;
+  private final Timer timer;
+
+  public DefaultControllerImpl() {
+    timer = new Timer();
+  }
 
   @Override
   public void registerListener(GeneratorListener<?> listener) {
@@ -184,6 +193,8 @@ public class DefaultControllerImpl
     order.setCallback(() -> audioPlayer.shutdown());
     this.audioPlayer.play(order);
     listeners.forEach(GeneratorListener::shutdown);
+    timer.cancel();
+    timer.purge();
   }
 
   @Override
@@ -284,6 +295,69 @@ public class DefaultControllerImpl
       locY = (int) data[1];
     }
     return new Point(locX, locY);
+  }
+
+  @Override
+  public void startSelfControlling(boolean skipAnimation) {
+    long start = 1;
+    long durationLetItSnow = 112;
+    long durationFractalsDraw = 37;
+    long timeOffset = skipAnimation ? start : 30;
+    timeOffset += durationLetItSnow;
+    long durationFrozenMusic = 3 * 60 + 41;
+
+    this.scheduleTask(start, () -> GuiUtils.postKeyEvent('F'));
+    this.scheduleTask(start, () -> GuiUtils.postKeyEvent('Y'));
+
+    start += durationFractalsDraw;
+    this.scheduleTask(start, () -> GuiUtils.postKeyEvent(SWT.F2));
+    start += durationFractalsDraw;
+    this.scheduleTask(start, () -> GuiUtils.postKeyEvent(SWT.F3));
+    start += durationFractalsDraw;
+    this.scheduleTask(start, () -> GuiUtils.postKeyEvent(SWT.F4));
+    //Turn off music let it snow
+    this.scheduleTask(timeOffset, () -> GuiUtils.postKeyEvent('Y'));
+
+    //Starts attack
+    this.scheduleTask(timeOffset + 3, () -> {
+      setAttackType(3);
+      if (!flagsConfiguration.isAttack()) {
+        switchAttack();
+      }
+    });
+
+    start += durationFractalsDraw;
+    // Start frozen music
+    this.scheduleTask(start, () -> {
+      GuiUtils.postKeyEvent('Y');
+      if (flagsConfiguration.isAttack()) {
+        switchAttack();
+      }
+      if (flagsConfiguration.isFractals()) {
+        switchFractals();
+      }
+    });
+
+    //Stop frozen music and wind
+    this.scheduleTask(start + durationFrozenMusic, () -> {
+      GuiUtils.postKeyEvent('Y');
+      GuiUtils.postKeyEvent(' ');
+    });
+    start += 35;
+    //Start wind
+    this.scheduleTask(start, () -> {
+      GuiUtils.postKeyEvent(' ');
+    });
+
+  }
+
+  private void scheduleTask(long delaySeconds, Runnable task) {
+    timer.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        task.run();
+      }
+    }, delaySeconds * 1000);
   }
 
 }

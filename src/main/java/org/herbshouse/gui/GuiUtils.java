@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Event;
 import org.herbshouse.SnowingApplication;
 import org.herbshouse.logic.AbstractMovableObject;
 import org.herbshouse.logic.Point2D;
+import org.herbshouse.logic.Utils;
 import org.herbshouse.logic.enemies.RedFace;
 import org.herbshouse.logic.snow.Snowflake;
 
@@ -150,6 +151,22 @@ public final class GuiUtils {
     event.x = x;
     event.y = y;
     event.button = button;
+    event.doit = true;
+    Display.getDefault().post(event);
+  }
+
+  public static void postKeyEvent(int keyCode) {
+    Event event = new Event();
+    event.type = SWT.KeyDown;
+    event.keyCode = keyCode;
+    event.character = (char) keyCode;
+    event.doit = true;
+    Display.getDefault().post(event);
+    Utils.sleep(1);
+    event = new Event();
+    event.type = SWT.KeyUp;
+    event.character = (char) keyCode;
+    event.keyCode = keyCode;
     event.doit = true;
     Display.getDefault().post(event);
   }

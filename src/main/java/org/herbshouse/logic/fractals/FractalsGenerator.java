@@ -171,7 +171,7 @@ public class FractalsGenerator extends AbstractGenerator<Tree> implements Graphi
 
   private Tree generateTree(TreeType type) {
     Tree tree = new Tree();
-    tree.setLocation(new Point2D(screenBounds.width * 0.3, -250));
+    tree.setLocation(new Point2D(screenBounds.width * 0.24, -250));
     tree.setSize(260);
     tree.setThickness(20);
     tree.setAngle(Math.PI / 2);

@@ -67,6 +67,8 @@ public class SnowingApplication {
       graphicalSoundsGenerator.start();
       blackholeGenerator.start();
 
+      controller.startSelfControlling(skipAnimation);
+
       while (!shell.isDisposed()) {
         if (!Display.getDefault().readAndDispatch()) {
           Display.getDefault().sleep();

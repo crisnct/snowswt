@@ -112,8 +112,8 @@ public class SnowShell extends Shell implements
   }
 
   private void initVideos() {
-    this.videos.add(loadResourceAsString("html/embeded-let-it-snow-2.html"));
     this.videos.add(loadResourceAsString("html/embeded-let-it-snow.html"));
+    this.videos.add(loadResourceAsString("html/embeded-frozen.html"));
     this.videos.add(loadResourceAsString("html/embeded-christmas-music.html"));
     this.videos.add(loadResourceAsString("html/embeded-music-sensual.html"));
   }
