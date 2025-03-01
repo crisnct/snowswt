@@ -20,8 +20,8 @@ public class Tests {
     DefaultControllerImpl controller = new DefaultControllerImpl();
     controller.setUserInfo(userInfo);
     controller.setDesiredFPS(60);
-    controller.registerListener(snowGenerator);
-    controller.registerListener(enemyGenerator);
+    controller.registerGenerator(snowGenerator);
+    controller.registerGenerator(enemyGenerator);
 
     enemyGenerator.setViewController(new ViewController() {
       @Override

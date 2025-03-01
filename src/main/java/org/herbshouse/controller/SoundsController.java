@@ -11,4 +11,7 @@ public interface SoundsController {
   void setAudio(AudioPlayer audioPlayer);
 
   void switchYoutube();
+
+  void playNextYoutube();
+
 }

@@ -11,7 +11,7 @@ import org.herbshouse.controller.MainController;
 import org.herbshouse.gui.GuiUtils;
 import org.herbshouse.gui.SWTResourceManager;
 import org.herbshouse.logic.AbstractMovableObject;
-import org.herbshouse.logic.GeneratorListener;
+import org.herbshouse.logic.Generator;
 import org.herbshouse.logic.GraphicalImageGenerator;
 import org.herbshouse.logic.graphicalSounds.GraphicalSoundsGenerator;
 import org.herbshouse.logic.snow.Snowflake;
@@ -76,24 +76,24 @@ public class SwtImageBuilder implements AutoCloseable {
     );
   }
 
-  public void drawCountDown(GeneratorListener<Snowflake> generatorListener) {
-    countdownDrawer.draw(gcImage, generatorListener, TEXT_MIDDLE_SCREEN);
+  public void drawCountDown(Generator<Snowflake> generator) {
+    countdownDrawer.draw(gcImage, generator, TEXT_MIDDLE_SCREEN);
   }
 
   public void drawLegend(int realFPS, int currentAttackPhase) {
     legendDrawer.draw(gcImage, realFPS, currentAttackPhase);
   }
 
-  public void drawEnemies(GeneratorListener<AbstractMovableObject> generatorListener) {
-    enemyDrawer.draw(gcImage, generatorListener);
+  public void drawEnemies(Generator<AbstractMovableObject> generator) {
+    enemyDrawer.draw(gcImage, generator);
   }
 
   public void drawSounds(GraphicalSoundsGenerator generatorListener) {
     soundsDrawer.draw(gcImage, generatorListener);
   }
 
-  public void drawSnowflakes(GeneratorListener<Snowflake> generatorListener) {
-    snowflakesDrawer.draw(gcImage, generatorListener);
+  public void drawSnowflakes(Generator<Snowflake> generator) {
+    snowflakesDrawer.draw(gcImage, generator);
   }
 
   public void drawImage(GraphicalImageGenerator generatorListener) {

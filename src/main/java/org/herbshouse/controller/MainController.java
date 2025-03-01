@@ -2,7 +2,7 @@ package org.herbshouse.controller;
 
 import java.util.List;
 import org.herbshouse.logic.AbstractMovableObject;
-import org.herbshouse.logic.GeneratorListener;
+import org.herbshouse.logic.Generator;
 import org.herbshouse.logic.UserInfo;
 
 public interface MainController {
@@ -17,9 +17,11 @@ public interface MainController {
 
   FlagsConfiguration getFlagsConfiguration();
 
-  void registerListener(GeneratorListener<?> listener);
+  void registerGenerator(Generator<?> listener);
 
-  List<GeneratorListener<? extends AbstractMovableObject>> getListeners();
+  void registerSoundController(SoundsController soundController);
+
+  List<Generator<? extends AbstractMovableObject>> getGenerators();
 
   int getDesiredFps();
 

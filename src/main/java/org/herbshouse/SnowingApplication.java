@@ -52,11 +52,12 @@ public class SnowingApplication {
       controller.setUserInfo(new UserInfo());
       controller.setTransform(transform);
       controller.setAudio(audioPlayer);
-      controller.registerListener(fractalsGenerator);
-      controller.registerListener(snowGenerator);
-      controller.registerListener(enemyGenerator);
-      controller.registerListener(graphicalSoundsGenerator);
-      controller.registerListener(blackholeGenerator);
+      controller.registerGenerator(fractalsGenerator);
+      controller.registerGenerator(snowGenerator);
+      controller.registerGenerator(enemyGenerator);
+      controller.registerGenerator(graphicalSoundsGenerator);
+      controller.registerGenerator(blackholeGenerator);
+      controller.registerSoundController(shell);
 
       shell.setController(controller);
       shell.open();

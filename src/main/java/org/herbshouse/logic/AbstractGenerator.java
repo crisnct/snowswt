@@ -8,7 +8,7 @@ import org.herbshouse.controller.GraphicalSoundConfig;
 import org.herbshouse.controller.ViewController;
 
 public abstract class AbstractGenerator<T extends AbstractMovableObject>
-    extends Thread implements GeneratorListener<T>, ViewController {
+    extends Thread implements Generator<T>, ViewController {
 
   protected FlagsConfiguration config;
 

@@ -8,5 +8,4 @@ public interface FractalsController {
 
   void setFractalsType(TreeType treeType);
 
-
 }

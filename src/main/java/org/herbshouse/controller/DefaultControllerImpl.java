@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.widgets.Display;
 import org.herbshouse.audio.AudioPlayOrder;
 import org.herbshouse.audio.AudioPlayType;
 import org.herbshouse.audio.AudioPlayer;
 import org.herbshouse.gui.GuiUtils;
 import org.herbshouse.logic.AbstractMovableObject;
-import org.herbshouse.logic.GeneratorListener;
+import org.herbshouse.logic.Generator;
 import org.herbshouse.logic.Point2D;
 import org.herbshouse.logic.UserInfo;
 import org.herbshouse.logic.fractals.TreeType;
@@ -29,7 +29,9 @@ public class DefaultControllerImpl
     SelfController {
 
   private final FlagsConfiguration flagsConfiguration = new FlagsConfiguration();
-  private final List<GeneratorListener<? extends AbstractMovableObject>> listeners = new ArrayList<>();
+  private final List<Generator<? extends AbstractMovableObject>> generators = new ArrayList<>();
+  private final List<SoundsController> soundControllers = new ArrayList<>();
+
   private int desiredFPS;
   private UserInfo userInfo;
   private Transform transform;
@@ -42,20 +44,30 @@ public class DefaultControllerImpl
   }
 
   @Override
-  public void registerListener(GeneratorListener<?> listener) {
+  public void registerGenerator(Generator<?> listener) {
     listener.setLogicController(this);
     listener.init(flagsConfiguration, GuiUtils.SCREEN_BOUNDS);
-    listeners.add(listener);
+    generators.add(listener);
+    if (listener instanceof SoundsController soundController) {
+      registerSoundController(soundController);
+    }
   }
 
   @Override
-  public List<GeneratorListener<? extends AbstractMovableObject>> getListeners() {
-    return listeners;
+  public void registerSoundController(SoundsController soundController) {
+    if (!soundControllers.contains(soundController)) {
+      soundControllers.add(soundController);
+    }
+  }
+
+  @Override
+  public List<Generator<? extends AbstractMovableObject>> getGenerators() {
+    return generators;
   }
 
   @Override
   public void mouseScrolled(int count) {
-    getListeners().forEach(l -> l.mouseScrolled(count));
+    getGenerators().forEach(l -> l.mouseScrolled(count));
   }
 
   @Override
@@ -99,7 +111,7 @@ public class DefaultControllerImpl
   @Override
   public void switchHappyWind() {
     if (!flagsConfiguration.isHappyWind()) {
-      listeners.forEach(GeneratorListener::turnOnHappyWind);
+      generators.forEach(Generator::turnOnHappyWind);
     }
     flagsConfiguration.switchHappyWind();
     if (flagsConfiguration.isHappyWind() && flagsConfiguration.isNormalWind()) {
@@ -115,7 +127,7 @@ public class DefaultControllerImpl
 
   @Override
   public void reset() {
-    listeners.forEach(GeneratorListener::reset);
+    generators.forEach(Generator::reset);
   }
 
   @Override
@@ -126,7 +138,7 @@ public class DefaultControllerImpl
   @Override
   public void switchDebug() {
     flagsConfiguration.switchDebug();
-    listeners.forEach(GeneratorListener::switchDebug);
+    generators.forEach(Generator::switchDebug);
   }
 
   @Override
@@ -137,7 +149,7 @@ public class DefaultControllerImpl
   @Override
   public void switchAttack() {
     flagsConfiguration.switchAttack();
-    listeners.forEach(GeneratorListener::switchAttack);
+    generators.forEach(Generator::switchAttack);
   }
 
   @Override
@@ -145,7 +157,7 @@ public class DefaultControllerImpl
     final int oldType = flagsConfiguration.getAttackType();
     flagsConfiguration.setAttackType(type);
     if (flagsConfiguration.isAttack()) {
-      listeners.forEach(l -> l.changeAttackType(oldType, type));
+      generators.forEach(l -> l.changeAttackType(oldType, type));
     }
   }
 
@@ -158,7 +170,7 @@ public class DefaultControllerImpl
   public void increaseSnowLevel() {
     if (flagsConfiguration.getSnowingLevel() < 10) {
       flagsConfiguration.increaseSnowingLevel();
-      listeners.forEach(GeneratorListener::changedSnowingLevel);
+      generators.forEach(Generator::changedSnowingLevel);
     }
   }
 
@@ -166,13 +178,23 @@ public class DefaultControllerImpl
   public void decreaseSnowLevel() {
     if (flagsConfiguration.getSnowingLevel() > 0) {
       flagsConfiguration.decreaseSnowingLevel();
-      listeners.forEach(GeneratorListener::changedSnowingLevel);
+      generators.forEach(Generator::changedSnowingLevel);
     }
   }
 
   @Override
   public void switchYoutube() {
     flagsConfiguration.switchYoutube();
+    Display.getDefault().syncExec(() -> {
+      soundControllers.forEach(SoundsController::switchYoutube);
+    });
+  }
+
+  @Override
+  public void playNextYoutube() {
+    Display.getDefault().syncExec(() -> {
+      soundControllers.forEach(SoundsController::playNextYoutube);
+    });
   }
 
   @Override
@@ -192,7 +214,7 @@ public class DefaultControllerImpl
     AudioPlayOrder order = new AudioPlayOrder("sounds/glass-breaking.wav");
     order.setCallback(() -> audioPlayer.shutdown());
     this.audioPlayer.play(order);
-    listeners.forEach(GeneratorListener::shutdown);
+    generators.forEach(Generator::shutdown);
     timer.cancel();
     timer.purge();
   }
@@ -210,36 +232,36 @@ public class DefaultControllerImpl
   @Override
   public void setFractalsType(TreeType treeType) {
     flagsConfiguration.setFractalsType(treeType);
-    listeners.forEach(GeneratorListener::changedFractalType);
+    generators.forEach(Generator::changedFractalType);
   }
 
   @Override
   public void switchBlackHoles() {
     flagsConfiguration.switchBlackHoles();
-    listeners.forEach(GeneratorListener::switchBlackHoles);
+    generators.forEach(Generator::switchBlackHoles);
   }
 
   @Override
   public void switchIndividualMovements() {
     flagsConfiguration.switchIndividualMovements();
-    listeners.forEach(GeneratorListener::switchIndividualMovements);
+    generators.forEach(Generator::switchIndividualMovements);
   }
 
   @Override
   public boolean canStart() {
-    return listeners.stream().allMatch(GeneratorListener::canControllerStart);
+    return generators.stream().allMatch(Generator::canControllerStart);
   }
 
   @Override
   public void switchGraphicalSounds() {
     flagsConfiguration.switchGraphicalSounds();
-    listeners.forEach(GeneratorListener::switchGraphicalSounds);
+    generators.forEach(Generator::switchGraphicalSounds);
   }
 
   @Override
   public void setGraphicalSound(GraphicalSoundConfig graphicalSoundConfig) {
     flagsConfiguration.setGraphicalSoundConfig(graphicalSoundConfig);
-    listeners.forEach(l -> l.changeGraphicalSound(graphicalSoundConfig));
+    generators.forEach(l -> l.changeGraphicalSound(graphicalSoundConfig));
   }
 
   public AudioPlayer getAudioPlayer() {
@@ -276,13 +298,13 @@ public class DefaultControllerImpl
   public void mouseMove(int x, int y) {
     Point2D mouseLoc = GuiUtils.toWorldCoord(convertLoc(x, y));
     getFlagsConfiguration().setMouseCurrentLocation(mouseLoc);
-    getListeners().forEach(l -> l.mouseMove(mouseLoc));
+    getGenerators().forEach(l -> l.mouseMove(mouseLoc));
   }
 
   @Override
   public void mouseDown(int button, int x, int y) {
     Point2D mouseLoc = GuiUtils.toWorldCoord(convertLoc(x, y));
-    getListeners().forEach(l -> l.mouseDown(button, mouseLoc));
+    getGenerators().forEach(l -> l.mouseDown(button, mouseLoc));
   }
 
   private Point convertLoc(int x, int y) {
@@ -306,17 +328,17 @@ public class DefaultControllerImpl
     timeOffset += durationLetItSnow;
     long durationFrozenMusic = 3 * 60 + 41;
 
-    this.scheduleTask(start, () -> GuiUtils.postKeyEvent('F'));
-    this.scheduleTask(start, () -> GuiUtils.postKeyEvent('Y'));
+    this.scheduleTask(start, this::switchFractals);
+    this.scheduleTask(start, this::switchYoutube);
 
     start += durationFractalsDraw;
-    this.scheduleTask(start, () -> GuiUtils.postKeyEvent(SWT.F2));
+    this.scheduleTask(start, () -> setFractalsType(TreeType.RANDOM_DEFAULT));
     start += durationFractalsDraw;
-    this.scheduleTask(start, () -> GuiUtils.postKeyEvent(SWT.F3));
+    this.scheduleTask(start, () -> setFractalsType(TreeType.PERFECT_FIR));
     start += durationFractalsDraw;
-    this.scheduleTask(start, () -> GuiUtils.postKeyEvent(SWT.F4));
+    this.scheduleTask(start, () -> setFractalsType(TreeType.RANDOM_FIR));
     //Turn off music let it snow
-    this.scheduleTask(timeOffset, () -> GuiUtils.postKeyEvent('Y'));
+    this.scheduleTask(timeOffset, this::switchYoutube);
 
     //Starts attack
     this.scheduleTask(timeOffset + 3, () -> {
@@ -329,7 +351,7 @@ public class DefaultControllerImpl
     start += durationFractalsDraw;
     // Start frozen music
     this.scheduleTask(start, () -> {
-      GuiUtils.postKeyEvent('Y');
+      switchYoutube();
       if (flagsConfiguration.isAttack()) {
         switchAttack();
       }
@@ -340,14 +362,12 @@ public class DefaultControllerImpl
 
     //Stop frozen music and wind
     this.scheduleTask(start + durationFrozenMusic, () -> {
-      GuiUtils.postKeyEvent('Y');
-      GuiUtils.postKeyEvent(' ');
+      switchYoutube();
+      switchNormalWind();
     });
     start += 35;
     //Start wind
-    this.scheduleTask(start, () -> {
-      GuiUtils.postKeyEvent(' ');
-    });
+    this.scheduleTask(start, this::switchNormalWind);
 
   }
 

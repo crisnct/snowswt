@@ -7,7 +7,7 @@ import org.herbshouse.controller.DefaultControllerImpl;
 import org.herbshouse.controller.FlagsConfiguration;
 import org.herbshouse.controller.GraphicalSoundConfig;
 
-public interface GeneratorListener<T extends AbstractMovableObject> {
+public interface Generator<T extends AbstractMovableObject> {
 
   void turnOnHappyWind();
 

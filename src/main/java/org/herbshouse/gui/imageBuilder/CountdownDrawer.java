@@ -7,27 +7,27 @@ import org.eclipse.swt.widgets.Display;
 import org.herbshouse.gui.GuiUtils;
 import org.herbshouse.gui.SWTResourceManager;
 import org.herbshouse.logic.AbstractMovableObject;
-import org.herbshouse.logic.GeneratorListener;
+import org.herbshouse.logic.Generator;
 
 class CountdownDrawer {
 
   public void draw(
       GC gc,
-      GeneratorListener<? extends AbstractMovableObject> generatorListener,
+      Generator<? extends AbstractMovableObject> generator,
       String textFromScreen
   ) {
     if (gc == null) {
       throw new IllegalArgumentException("Unproper usage of SwtImageBuilder");
     }
     //Draw countdown
-    if (generatorListener.getCountdown() >= 0) {
-      if (generatorListener.getCountdown() >= 4) {
+    if (generator.getCountdown() >= 0) {
+      if (generator.getCountdown() >= 4) {
         gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
       } else {
         gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
       }
       gc.setFont(SWTResourceManager.getFont("Arial", 25, SWT.BOLD));
-      String countdown = String.valueOf(generatorListener.getCountdown());
+      String countdown = String.valueOf(generator.getCountdown());
       Point countdownSize = gc.stringExtent(countdown);
       Point textSize = gc.stringExtent(textFromScreen);
       gc.drawText(countdown, (GuiUtils.SCREEN_BOUNDS.width - countdownSize.x) / 2,

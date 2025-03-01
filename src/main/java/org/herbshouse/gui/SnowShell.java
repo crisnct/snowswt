@@ -30,8 +30,10 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.herbshouse.SnowingApplication;
+import org.herbshouse.audio.AudioPlayer;
 import org.herbshouse.controller.BlackholeController;
 import org.herbshouse.controller.FractalsController;
+import org.herbshouse.controller.GraphicalSoundConfig;
 import org.herbshouse.controller.MainController;
 import org.herbshouse.controller.MouseController;
 import org.herbshouse.controller.RedfacesController;
@@ -40,7 +42,7 @@ import org.herbshouse.controller.SoundsController;
 import org.herbshouse.controller.ViewController;
 import org.herbshouse.gui.imageBuilder.SwtImageBuilder;
 import org.herbshouse.logic.AbstractMovableObject;
-import org.herbshouse.logic.GeneratorListener;
+import org.herbshouse.logic.Generator;
 import org.herbshouse.logic.GraphicalImageGenerator;
 import org.herbshouse.logic.blackhole.BlackholeGenerator;
 import org.herbshouse.logic.enemies.EnemyGenerator;
@@ -56,7 +58,12 @@ import org.herbshouse.logic.snow.Snowflake;
  * options, and snowflake freezing. The application continuously updates the display to simulate falling snowflakes.
  */
 public class SnowShell extends Shell implements
-    PaintListener, MouseListener, MouseMoveListener, MouseWheelListener, KeyListener,
+    PaintListener,
+    MouseListener,
+    MouseMoveListener,
+    MouseWheelListener,
+    KeyListener,
+    SoundsController,
     ViewController {
 
   private final Canvas canvas;
@@ -134,7 +141,8 @@ public class SnowShell extends Shell implements
     browser.setEnabled(false);
   }
 
-  private void playNext() {
+  @Override
+  public void playNextYoutube() {
     browser.setText(videos.get(videosIndex++ % videos.size()), true);
   }
 
@@ -190,15 +198,15 @@ public class SnowShell extends Shell implements
 
     try (var imageBuilder = swtImageBuilder.drawBaseElements()) {
       //Draw objects from each listener
-      for (GeneratorListener<? extends AbstractMovableObject> listener : controller.getListeners()) {
+      for (Generator<? extends AbstractMovableObject> listener : controller.getGenerators()) {
         if (listener instanceof SnowGenerator) {
-          GeneratorListener<Snowflake> generatorListener = (GeneratorListener<Snowflake>) listener;
-          imageBuilder.drawSnowflakes(generatorListener);
-          imageBuilder.drawCountDown(generatorListener);
+          Generator<Snowflake> generator = (Generator<Snowflake>) listener;
+          imageBuilder.drawSnowflakes(generator);
+          imageBuilder.drawCountDown(generator);
         } else if (listener instanceof BlackholeGenerator) {
-          imageBuilder.drawSnowflakes((GeneratorListener<Snowflake>) listener);
+          imageBuilder.drawSnowflakes((Generator<Snowflake>) listener);
         } else if (listener instanceof EnemyGenerator) {
-          imageBuilder.drawEnemies((GeneratorListener<AbstractMovableObject>) listener);
+          imageBuilder.drawEnemies((Generator<AbstractMovableObject>) listener);
         } else if (listener instanceof GraphicalSoundsGenerator) {
           imageBuilder.drawSounds((GraphicalSoundsGenerator) listener);
         } else if (listener instanceof GraphicalImageGenerator) {
@@ -223,8 +231,8 @@ public class SnowShell extends Shell implements
       } else {
         gc.drawImage(image, 0, 0);
       }
-      for (GeneratorListener<?> generatorListener : controller.getListeners()) {
-        generatorListener.provideImageData(imageData);
+      for (Generator<?> generator : controller.getGenerators()) {
+        generator.provideImageData(imageData);
       }
     }
 
@@ -365,10 +373,6 @@ public class SnowShell extends Shell implements
       case 'Y':
         if (controller instanceof SoundsController soundsController) {
           soundsController.switchYoutube();
-          updateBrowser(controller.getFlagsConfiguration().isYoutube());
-          if (controller.getFlagsConfiguration().isYoutube()) {
-            playNext();
-          }
         }
         break;
       case 'e':
@@ -385,8 +389,8 @@ public class SnowShell extends Shell implements
         break;
       case 'n':
       case 'N':
-        if (browser != null) {
-          playNext();
+        if (browser != null && controller instanceof SoundsController soundsController) {
+          soundsController.playNextYoutube();
         }
         break;
       case 'f':
@@ -424,6 +428,29 @@ public class SnowShell extends Shell implements
         controller.shutdown();
         startShutdown = true;
         break;
+    }
+  }
+
+  @Override
+  public void switchGraphicalSounds() {
+
+  }
+
+  @Override
+  public void setGraphicalSound(GraphicalSoundConfig graphicalSoundConfig) {
+
+  }
+
+  @Override
+  public void setAudio(AudioPlayer audioPlayer) {
+
+  }
+
+  @Override
+  public void switchYoutube() {
+    updateBrowser(controller.getFlagsConfiguration().isYoutube());
+    if (controller.getFlagsConfiguration().isYoutube()) {
+      playNextYoutube();
     }
   }
 

@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Display;
 import org.herbshouse.controller.FlagsConfiguration;
 import org.herbshouse.controller.MainController;
 import org.herbshouse.gui.GuiUtils;
-import org.herbshouse.logic.GeneratorListener;
+import org.herbshouse.logic.Generator;
 import org.herbshouse.logic.Point2D;
 import org.herbshouse.logic.Utils;
 import org.herbshouse.logic.snow.Snowflake;
@@ -20,14 +20,14 @@ class SnowflakesDrawer {
     this.controller = controller;
   }
 
-  public void draw(GC gc, GeneratorListener<Snowflake> generatorListener) {
+  public void draw(GC gc, Generator<Snowflake> generator) {
     if (gc == null) {
       throw new IllegalArgumentException("Unproper usage of SwtImageBuilder");
     }
     //Draw snowflakes
     gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED));
-    List<Snowflake> snowflakes = generatorListener.getMoveableObjects();
+    List<Snowflake> snowflakes = generator.getMoveableObjects();
     FlagsConfiguration config = controller.getFlagsConfiguration();
     for (Snowflake snowflake : snowflakes) {
       if (config.isMercedesSnowflakes()) {

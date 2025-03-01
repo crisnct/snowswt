@@ -9,19 +9,19 @@ import org.herbshouse.SnowingApplication;
 import org.herbshouse.gui.GuiUtils;
 import org.herbshouse.gui.SWTResourceManager;
 import org.herbshouse.logic.AbstractMovableObject;
-import org.herbshouse.logic.GeneratorListener;
+import org.herbshouse.logic.Generator;
 import org.herbshouse.logic.enemies.AnimatedGif;
 import org.herbshouse.logic.enemies.RedFace;
 
 class EnemyDrawer {
 
-  public void draw(GC gc, GeneratorListener<AbstractMovableObject> generatorListener) {
+  public void draw(GC gc, Generator<AbstractMovableObject> generator) {
     if (gc == null) {
       throw new IllegalArgumentException("Unproper usage of SwtImageBuilder");
     }
     gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
     gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED));
-    for (AbstractMovableObject obj : generatorListener.getMoveableObjects()) {
+    for (AbstractMovableObject obj : generator.getMoveableObjects()) {
       if (obj instanceof RedFace redFace) {
         GuiUtils.drawRedFace(gc, redFace);
       } else if (obj instanceof AnimatedGif animatedGif) {
