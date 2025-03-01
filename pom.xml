@@ -6,7 +6,7 @@
 
     <groupId>org.herbshouse</groupId>
     <artifactId>snowswt</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <name>Snowing simulator</name>
     <url>https://github.com/crisnct/snowswt</url>
 
