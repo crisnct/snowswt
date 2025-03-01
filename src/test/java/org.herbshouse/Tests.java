@@ -1,7 +1,6 @@
 package org.herbshouse;
 
 import org.herbshouse.controller.DefaultControllerImpl;
-import org.herbshouse.controller.ViewController;
 import org.herbshouse.logic.UserInfo;
 import org.herbshouse.logic.Utils;
 import org.herbshouse.logic.enemies.EnemyGenerator;
@@ -23,17 +22,6 @@ public class Tests {
     controller.registerGenerator(snowGenerator);
     controller.registerGenerator(enemyGenerator);
 
-    enemyGenerator.setViewController(new ViewController() {
-      @Override
-      public void substractAreaFromShell(int[] polygon) {
-
-      }
-
-      @Override
-      public void resetScreenSurface() {
-
-      }
-    });
     snowGenerator.start();
     enemyGenerator.start();
 
