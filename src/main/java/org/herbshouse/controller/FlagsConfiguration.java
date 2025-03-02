@@ -22,7 +22,7 @@ public class FlagsConfiguration {
   private boolean graphicalSounds;
 
   private int attackType = 1;
-  private int snowingLevel = 5;
+  private int snowingLevel = 1;
   private Point2D mouseLoc = new Point2D();
   private TreeType fractalsType = TreeType.PERFECT_DEFAULT;
   private GraphicalSoundConfig graphicalSoundConfig

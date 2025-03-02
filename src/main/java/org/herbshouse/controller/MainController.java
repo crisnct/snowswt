@@ -31,4 +31,7 @@ public interface MainController {
 
   void shutdown();
 
+  boolean isDemoRunning();
+
+  void turnOffDemoMode();
 }

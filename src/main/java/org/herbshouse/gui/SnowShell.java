@@ -214,8 +214,11 @@ public class SnowShell extends Shell implements
         }
       }
 
-      imageBuilder.drawText();
-      if (controller.canStart()) {
+      if (controller.isDemoRunning()) {
+        imageBuilder.drawSkipDemo();
+      }
+      imageBuilder.drawHappyNewYear();
+      if (controller.canStart() && !controller.isDemoRunning()) {
         int attackPhase = 0;
         if (controller instanceof SnowflakesController snowflakesController) {
           attackPhase = snowflakesController.getCurrentAttackPhase();
@@ -280,6 +283,12 @@ public class SnowShell extends Shell implements
 
   @Override
   public void keyPressed(KeyEvent e) {
+    if (controller.isDemoRunning()) {
+      if (e.character == 'S' || e.character == 's') {
+        controller.turnOffDemoMode();
+      }
+      return;
+    }
     if (!controller.canStart()) {
       return;
     }

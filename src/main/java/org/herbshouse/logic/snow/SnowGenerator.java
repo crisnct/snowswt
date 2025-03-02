@@ -440,7 +440,6 @@ public class SnowGenerator extends AbstractGenerator<Snowflake> {
         }
       } else {
         pauseSnowing = config.isAttack();
-        snowflakesTimeGen = (int) Utils.linearInterpolation(config.getSnowingLevel(), 1, 30, 10, 5);
         this.resetSnowingTimer();
       }
     } catch (InterruptedException e) {
@@ -495,6 +494,7 @@ public class SnowGenerator extends AbstractGenerator<Snowflake> {
     if (taskSnowing != null) {
       taskSnowing.cancel();
     }
+    snowflakesTimeGen = (int) Utils.linearInterpolation(config.getSnowingLevel(), 1, 30, 10, 5);
     taskSnowing = new TimerTask() {
       @Override
       public void run() {

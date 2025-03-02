@@ -27,7 +27,7 @@ public class DefaultControllerImpl
     RedfacesController,
     BlackholeController,
     ViewController,
-    SelfController {
+    DemoModeController {
 
   private final FlagsConfiguration flagsConfiguration = new FlagsConfiguration();
   private final List<Generator<? extends AbstractMovableObject>> generators = new ArrayList<>();
@@ -40,6 +40,7 @@ public class DefaultControllerImpl
   private int currentAttackPhase;
   private AudioPlayer audioPlayer;
   private final Timer timer;
+  private boolean demoRunning;
 
   public DefaultControllerImpl() {
     timer = new Timer();
@@ -226,6 +227,39 @@ public class DefaultControllerImpl
   }
 
   @Override
+  public boolean isDemoRunning() {
+    return demoRunning;
+  }
+
+  @Override
+  public void turnOffDemoMode() {
+    timer.cancel();
+    timer.purge();
+    demoRunning = false;
+    if (flagsConfiguration.isYoutube()) {
+      switchYoutube();
+    }
+    if (flagsConfiguration.isAttack()) {
+      switchAttack();
+    }
+    if (flagsConfiguration.isFractals()) {
+      switchFractals();
+    }
+    if (flagsConfiguration.isEnemies()) {
+      switchEnemies();
+    }
+    if (flagsConfiguration.isBlackHoles()) {
+      switchBlackHoles();
+    }
+    if (flagsConfiguration.isNormalWind()) {
+      switchNormalWind();
+    }
+    if (flagsConfiguration.isMercedesSnowflakes()) {
+      switchMercedesSnowflakes();
+    }
+  }
+
+  @Override
   public void setAudio(AudioPlayer audioPlayer) {
     this.audioPlayer = audioPlayer;
   }
@@ -326,7 +360,8 @@ public class DefaultControllerImpl
   }
 
   @Override
-  public void startSelfControlling(boolean skipAnimation) {
+  public void startDemoMode(boolean skipAnimation) {
+    demoRunning = true;
     long durationLetItSnow = 60 + 52;
     long durationFractalsDraw = 37;
     long durationFrozenMusic = 3 * 60 + 41;
@@ -341,15 +376,18 @@ public class DefaultControllerImpl
         switchAttack();
       }
     });
+
+    this.scheduleTask(time + 45, this::switchMercedesSnowflakes);
     this.scheduleTask(time + 60, () -> {
+      switchMercedesSnowflakes();
       setAttackType(2);
+      increaseSnowLevel();
+      increaseSnowLevel();
+      increaseSnowLevel();
+      increaseSnowLevel();
     });
-    this.scheduleTask(time + 90, () -> {
-      setAttackType(3);
-    });
-    this.scheduleTask(time + 120, () -> {
-      setAttackType(4);
-    });
+    this.scheduleTask(time + 90, () -> setAttackType(3));
+    this.scheduleTask(time + 145, () -> setAttackType(4));
     this.scheduleTask(time + durationLetItSnow, this::switchYoutube);
 
     //Fractals
@@ -362,8 +400,10 @@ public class DefaultControllerImpl
     time += durationFractalsDraw;
 
     // Start play Frozen
-    this.scheduleTask(time, () -> {
-      switchYoutube();
+    this.scheduleTask(time, this::switchYoutube);
+
+    //Stop snowflakes attack
+    this.scheduleTask(time + 25, () -> {
       if (flagsConfiguration.isAttack()) {
         switchAttack();
       }
@@ -372,15 +412,26 @@ public class DefaultControllerImpl
       }
     });
 
+    //Start wind
+    this.scheduleTask(time + 35, this::switchNormalWind);
+
     //Stop frozen music and wind
-    this.scheduleTask(time + durationFrozenMusic, () -> {
+    time += durationFrozenMusic;
+    this.scheduleTask(time, () -> {
       switchYoutube();
       switchNormalWind();
       reset();
     });
-    time += 35;
-    //Start wind
-    this.scheduleTask(time, this::switchNormalWind);
+
+    time += 1;
+    this.scheduleTask(time, this::switchBlackHoles);
+
+    time += 60;
+    this.scheduleTask(time, () -> {
+      switchBlackHoles();
+      switchEnemies();
+      demoRunning = false;
+    });
 
   }
 

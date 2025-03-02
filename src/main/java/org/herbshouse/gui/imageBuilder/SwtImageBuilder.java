@@ -24,7 +24,6 @@ public class SwtImageBuilder implements AutoCloseable {
   private final Transform transform;
   private final LegendDrawer legendDrawer;
   private final TextDrawer textDrawer;
-  private final CountdownDrawer countdownDrawer;
   private final SnowflakesDrawer snowflakesDrawer;
   private final EnemyDrawer enemyDrawer;
   private final LogoDrawer logoDrawer;
@@ -38,7 +37,6 @@ public class SwtImageBuilder implements AutoCloseable {
     this.transform = transform;
     this.legendDrawer = new LegendDrawer(controller);
     this.textDrawer = new TextDrawer();
-    this.countdownDrawer = new CountdownDrawer();
     this.snowflakesDrawer = new SnowflakesDrawer(controller);
     this.enemyDrawer = new EnemyDrawer();
     this.logoDrawer = new LogoDrawer();
@@ -69,7 +67,7 @@ public class SwtImageBuilder implements AutoCloseable {
     }
   }
 
-  public void drawText() {
+  public void drawHappyNewYear() {
     textDrawer.drawCenteredText(gcImage, TEXT_MIDDLE_SCREEN,
         SWTResourceManager.getFont("Arial", 25, SWT.BOLD),
         SWT.COLOR_CYAN
@@ -77,7 +75,11 @@ public class SwtImageBuilder implements AutoCloseable {
   }
 
   public void drawCountDown(Generator<Snowflake> generator) {
-    countdownDrawer.draw(gcImage, generator, TEXT_MIDDLE_SCREEN);
+    textDrawer.drawCountDown(gcImage, generator, TEXT_MIDDLE_SCREEN);
+  }
+
+  public void drawSkipDemo() {
+    textDrawer.drawSkipDemo(gcImage);
   }
 
   public void drawLegend(int realFPS, int currentAttackPhase) {

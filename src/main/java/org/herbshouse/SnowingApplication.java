@@ -70,7 +70,7 @@ public class SnowingApplication {
       graphicalSoundsGenerator.start();
       blackholeGenerator.start();
 
-      controller.startSelfControlling(skipAnimation);
+      controller.startDemoMode(skipAnimation);
 
       while (!shell.isDisposed()) {
         if (!Display.getDefault().readAndDispatch()) {
