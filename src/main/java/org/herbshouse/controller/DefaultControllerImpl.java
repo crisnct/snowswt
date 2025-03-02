@@ -361,13 +361,16 @@ public class DefaultControllerImpl
 
   @Override
   public void startDemoMode(boolean skipAnimation) {
-    demoRunning = true;
     long durationLetItSnow = 60 + 52;
     long durationFractalsDraw = 37;
     long durationFrozenMusic = 3 * 60 + 41;
     long time = skipAnimation ? 1 : 40;
 
-    this.scheduleTask(time, this::switchFractals);
+    this.scheduleTask(time, () -> {
+          demoRunning = true;
+          switchFractals();
+        }
+    );
 
     //Play Let it snow
     this.scheduleTask(time, this::switchYoutube);
