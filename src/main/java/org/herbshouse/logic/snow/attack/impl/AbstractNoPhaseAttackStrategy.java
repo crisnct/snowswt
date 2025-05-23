@@ -19,7 +19,7 @@ public abstract class AbstractNoPhaseAttackStrategy<T extends AbstractAttackData
   }
 
   public void playAudio(String filename, AudioPlayType type, float volume) {
-    if (!audioPlayer.isPlaying("sounds/" + filename)) {
+    if (audioPlayer != null && audioPlayer.isPlaying("sounds/" + filename)) {
       AudioPlayOrder order = new AudioPlayOrder("sounds/" + filename);
       order.setType(type);
       order.setVolume(volume);
@@ -28,7 +28,9 @@ public abstract class AbstractNoPhaseAttackStrategy<T extends AbstractAttackData
   }
 
   public void stopAudio(String filename) {
-    audioPlayer.stop("sounds/" + filename);
+    if (audioPlayer != null) {
+      audioPlayer.stop("sounds/" + filename);
+    }
   }
 
   @Override

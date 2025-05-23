@@ -219,8 +219,10 @@ public class DefaultControllerImpl
   @Override
   public void shutdown() {
     AudioPlayOrder order = new AudioPlayOrder("sounds/glass-breaking.wav");
-    order.setCallback(() -> audioPlayer.shutdown());
-    this.audioPlayer.play(order);
+    if (this.audioPlayer != null) {
+      order.setCallback(() -> audioPlayer.shutdown());
+      this.audioPlayer.play(order);
+    }
     generators.forEach(Generator::shutdown);
     timer.cancel();
     timer.purge();
